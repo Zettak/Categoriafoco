@@ -34,6 +34,67 @@ function actualizar(el){
  document.getElementById('a').textContent=a;
  document.getElementById('g').textContent=g;
 }
+ function guardarRegistro(){
+
+let nombre = document.querySelector(‘input[placeholder=“Ingresa tu nombre”]’).value;
+let turno = document.querySelector(‘select’).value;
+let fecha = new Date().toLocaleDateString(‘es-CL’);
+
+let registro = {
+fecha: fecha,
+nombre: nombre,
+turno: turno
+};
+
+let historial = JSON.parse(localStorage.getItem(‘foco121_historial’) || ‘[]’);
+
+let existe = historial.findIndex(r =>
+r.fecha === fecha &&
+r.turno === turno
+);
+
+if(existe >= 0){
+if(!confirm(‘Ya existe un registro para esta fecha y turno. ¿Desea reemplazarlo?’)){
+return;
+}
+historial.splice(existe,1);
+}
+
+historial.unshift(registro);
+
+  
+localStorage.setItem(
+‘foco121_historial’,
+JSON.stringify(historial)
+);
+
+mostrarHistorial();
+}
+
+function mostrarHistorial(){
+
+let historial = JSON.parse(localStorage.getItem(‘foco121_historial’) || ‘[]’);
+
+let html = ‘’;
+
+historial.forEach(r => {
+html += <div style="border-top:1px solid #ddd;padding:8px 0"> 📅 ${r.fecha} - 👤 ${r.nombre} - 🕒 ${r.turno} </div>;
+});
+
+if(html === ‘’){
+html = ‘No hay registros guardados.’;
+}
+
+document.getElementById(‘historial’).innerHTML = html;
+}
+
+window.onload = function(){
+mostrarHistorial();
+
+document
+.getElementById(‘guardarBtn’)
+.addEventListener(‘click’, guardarRegistro);
+}
 </script>
 </head>
 <body>
